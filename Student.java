@@ -8,32 +8,49 @@ public class Student {
     protected int age;
     protected Grade[] grades;
 
-    Student(){
+    Student(String name, String surname, int age , String SchoolId){
         grades = new Grade[0];
+        this.name = name;
+        this.surname = surname;
+        this.age= age;
+        this.SchoolId= SchoolId;
     }
 
     public void addGrade(Grade grade){
-        Grade[] newGrades = new Grade[grades.length+1];
-        for(int i = 0; i<grades.length; i++){
-            newGrades[i]= grades[i];
+        Grade[] newGrades = new Grade[grades.length + 1];
+        for(int i = 0; i < grades.length; i++){
+            newGrades[i] = grades[i];
         }
-        newGrades[grades.length+1] = grade;
+        newGrades[grades.length] = grade;
         grades = newGrades;
     }
+    
     public void setGrade(String examName, float weight, float points){
+        boolean isFound = false;
         for (Grade grade : grades) {
             if(grade.getExamName().equals(examName)){
                 grade.setPoints(points);
                 grade.setWeight(weight);
+                isFound = true;
+                break;
             }
-            else{
+        }
+        if(!isFound){
+            if(examName.length() > 3){
                 Grade newGrade = new Grade();
                 newGrade.setExamName(examName);
                 newGrade.setPoints(points);
                 newGrade.setWeight(weight);
                 addGrade(newGrade);
             }
+            else{
+                System.out.println(examName + " must be longer than 3 characters!");
+            }
         }
+    }
+    
+    public Grade[] getGrades() {
+        return grades;
     }
     public int getAge() {
         return age;

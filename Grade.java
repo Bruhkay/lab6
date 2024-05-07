@@ -22,4 +22,9 @@ public class Grade {
     public float getWeight() {
         return weight;
     }
+    @Override
+    public String toString() {
+        // TODO Auto-generated method stub
+        return examName+ " (Weight: " + weight +") "+ points;
+    }
 }
