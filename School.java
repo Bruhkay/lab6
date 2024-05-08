@@ -10,146 +10,129 @@ public class School {
     School(){
         students = new Student[10];
     }
-
-    public void addStudent(Student Student){
-        if(students[0]==null){
-            students[0]= Student;
-        } 
-        else{
-            int count = 0;
-            
-            for (Student student2 : students) {
-                if(student2!=null){
-                    count++;
-                } 
-            }
-            boolean alreadyTaken = false;
-            for(int i =0; i< count-1; i++){
-                if(Student.getSchoolId().equals(students[i].getSchoolId())){
-                    alreadyTaken = true;
-                    System.out.println("Duplicate ID: " + Student.getSchoolId());
-                }
-            }
-            if(!alreadyTaken){
-
-                Student[] newStudents = new Student[students.length];
-                if(count-1 == students.length/2){
-                    newStudents = new Student[students.length*2];
-                }
-                int index =0;
-                boolean isOkay = false;
-                
-                while(!isOkay){
-                    
-                    if(Long.parseLong(Student.getSchoolId()) <= Long.parseLong(students[index].getSchoolId()) || index==count-1){
-                        isOkay = true;
-                        if(index==count-1){
-                            index++;
-                        }
-                    }
-                    else{
-                        index++;
-                    }
-                    
-                }
-                for(int i=0; i<index; i++){
-                    newStudents[i] = students[i];
-
-                }
-                newStudents[index]= Student;
-                for(int i=index+1; i< students.length;i++){
-                    
-                    newStudents[i] = students[i-1];
-                }
-                students = newStudents;
+    public void addStudent(Student student) {
+        int count = 0;
+        for (Student s : students) {
+            if (s != null) {
+                count++;
             }
         }
-    } 
     
-    public Student getStudent(String id){
-        int count = 0;
+        for (int i = 0; i < count; i++) {
+            if (student.getSchoolId().equals(students[i].getSchoolId())) {
+                System.out.println("Duplicate ID: " + student.getSchoolId());
+                return;
+            }
+        }
+    
+        if (count == students.length) {
+            Student[] newStudents = new Student[students.length * 2];
+            System.arraycopy(students, 0, newStudents, 0, students.length);
+            students = newStudents;
+        }
+    
+        int index = count;
+        for (int i = 0; i < count; i++) {
+            if (Long.parseLong(student.getSchoolId()) < Long.parseLong(students[i].getSchoolId())) {
+                index = i;
+                break;
+            }
+        }
+    
+        for (int i = count; i > index; i--) {
+            students[i] = students[i - 1];
+        }
+    
+        students[index] = student;
+    }
+    
+    public Student getStudent(String id) {
+        
+        int count =0;
         for (Student student2 : students) {
             if(student2!=null){
                 count++;
             } 
         }
-        int upperindex = count-1;
         int lowerIndex = 0;
-        int index = count/2;
-        boolean finded = false;
-        while(!finded){
-
-            if(Math.abs(lowerIndex-upperindex) <=2){
-                if(Long.parseLong(students[lowerIndex].getSchoolId())== Long.parseLong(id)){
-                    index = lowerIndex;
-                }
-                else if(Long.parseLong(students[upperindex].getSchoolId())== Long.parseLong(id)){
-                    index = upperindex;
-                }
-                else if(Long.parseLong(students[(upperindex+lowerIndex)/2].getSchoolId())== Long.parseLong(id)){
-                    index = (lowerIndex+ upperindex)/2;
-                }
-                else{
-                    System.out.println("No such student with the id " + id + "!");
-                }
-                finded = true;
+        int upperindex = count - 1;
+    
+        while (lowerIndex <= upperindex) {
+            int index = (lowerIndex + upperindex) / 2;
+            long studentId = Long.parseLong(students[index].getSchoolId());
+    
+            if (studentId == Long.parseLong(id)) {
+                return students[index];
+            } else if (studentId < Long.parseLong(id)) {
+                lowerIndex = index + 1;
+            } else {
+                upperindex = index - 1;
             }
-            try {
-                if(Long.parseLong(students[index].getSchoolId())<= Long.parseLong(id)){
-                    lowerIndex= index;
-                    index = (lowerIndex + upperindex)/2;
-                }
-                else if(Long.parseLong(students[index].getSchoolId())>= Long.parseLong(id)){
-                    upperindex= index;
-                    index = (lowerIndex + upperindex)/2;
-                }
-            } catch (Exception e) {
-                System.out.println("ogrenci yok");
-                finded = true;
-            }
-            
         }
-        return students[index];
+    
+    
+        System.out.println("No such student with the id " + id + "!");
+        return null;
     }
+    
     public Student[] getStudentByNameOrder(){
+        
         Student[] nameOrdered = new Student[students.length];
         for(int i=0; i<students.length; i++){
             nameOrdered[i] = students[i];
         }
-        quickSort(nameOrdered, 0, students.length - 1);
+        int count =0;
+        for (Student student2 : students) {
+            if(student2!=null){
+                count++;
+            } 
+        }
+        quickSort(nameOrdered, 0, count - 1);
         return nameOrdered;
     }
-    public static void quickSort(Student[] arr, int low, int high) {
-        if (low < high) {
-            int pivotIndex = divide(arr, low, high);
-            quickSort(arr, low, pivotIndex - 1);
-            quickSort(arr, pivotIndex + 1, high);
-        }
-    }
 
-    public static int divide(Student[] arr, int low, int high) {
-        String pivot = arr[high].getName();
-        int i = low - 1;
-
-        for (int j = low; j < high; j++) {
-            if (arr[j].getName().compareTo(pivot) < 0) {
-                i++;
-                Student temp = arr[i];
-                arr[i] = arr[j];
-                arr[j] = temp;
+    public void printStudentsByNameOrder(){
+        System.out.println();
+        System.out.println("Students by name order: ");
+        for (Student student : getStudentByNameOrder()) {
+            if(student != null){
+                System.out.println(student);
             }
         }
-        Student temp = arr[i];
-        arr[i+1] = arr[high];
-        arr[high] = temp;
-        return i + 1;
+        System.out.println();
     }
-    public void printStudentsByNameOrder(){
-        for (Student student : getStudentByNameOrder()) {
-            System.out.println(student);
+           
+    public static void quickSort(Student[] array, int begin, int end) {
+        if (begin < end) {
+            int partitionIndex = partition(array, begin, end);
+
+            quickSort(array, begin, partitionIndex-1);
+            quickSort(array, partitionIndex+1, end);
         }
     }
-    
+
+    private static int partition(Student[] array, int begin, int end) {
+        String pivot = array[end].getName()+array[end].getSurname();
+        int i = (begin-1);
+
+        for (int j = begin; j < end; j++) {
+            if ((array[j].getName()+array[j].getSurname()).compareToIgnoreCase(pivot) < 0) {
+                i++;
+
+                Student swapTemp = array[i];
+                array[i] = array[j];
+                array[j] = swapTemp;
+            }
+        }
+
+        Student swapTemp = array[i+1];
+        array[i+1] = array[end];
+        array[end] = swapTemp;
+
+        return i+1;
+    }
+
+
     public void printStudents(){
         System.out.println("List all students: ");
         for (Student student : students) {
@@ -158,81 +141,148 @@ public class School {
             }
         }
     }
-    public float getGradeAverage(Student s){
+    
+    public float getGradeAverage(Student s) {
+        if (s.getGrades() == null || s.getGrades().length == 0) {
+            return 0; 
+        }
         float sum = 0;
-        float weight =0;
-        for(int i=0; i< s.getGrades().length; i++){
-            weight += s.getGrades()[i].getWeight();
-            sum += s.getGrades()[i].getPoints()*s.getGrades()[i].getWeight();
+        float weight = 0;
+        for (Grade grade : s.getGrades()) {
+            if (grade != null && grade.getWeight() != 0) {
+                weight += grade.getWeight();
+                sum += grade.getPoints() * grade.getWeight();
+            } else {
+                return 0; 
+            }
         }
-        return sum/weight;
-    }
-    public void printStudentsGradeAverages(){ //decending order lazim
-        for(int i = 0; i< students.length;i++){
-            System.out.println(students[i] +"- Average: "+ getGradeAverage(students[i]));
+    
+        if (weight == 0) {
+            return 0; 
         }
+    
+        return sum / weight;
     }
+    
+
+    public void printStudentsGradeAverages(){ 
+        Student[] newList = new Student[students.length];
+        for (int i = 0; i< students.length; i++) {
+            newList[i]= students[i];
+        }
+        int count=0;
+        for (Student student2 : students) {
+            if(student2!=null){
+                count++;
+            } 
+        }
+        boolean isChanged = true;
+        while(isChanged){
+            isChanged = false;
+            for(int j = 0; j< count-1; j++){
+                if(getGradeAverage(newList[j]) < getGradeAverage(newList[j+1])){
+                    Student temp;
+                    temp = newList[j];
+                    newList[j] = newList[j+1];
+                    newList[j+1] = temp;
+                    isChanged = true;
+                }
+            }
+        }
+        System.out.println();
+        System.out.println("Printing by grade averages; ");
+        System.out.println();
+        for(int i = 0; i< count;i++){
+            if(newList[i] != null ){
+                if(newList[i].getGrades() != null){
+                    System.out.println(newList[i] +"- Average: "+ getGradeAverage(newList[i]));
+                }
+            }
+        }
+        System.out.println();
+    }
+
     public void printGradesOf(String schoolID){
+        System.out.println();
         System.out.println("Student: "+ getStudent(schoolID));
-        System.out.println("Grades: ");
-        for(int i = 0; i<getStudent(schoolID).getGrades().length; i++){
-            System.out.println(getStudent(schoolID).getGrades()[i]);
+        System.out.println();
+        System.out.println("Grades: "); 
+        if(getStudent(schoolID)!=null){
+            for(int i = 0; i < getStudent(schoolID).getGrades().length; i++){
+                System.out.println(getStudent(schoolID).getGrades()[i]);
+            }
+            System.out.println();
         }
     }
+
     public void processTextFile(String filename) {
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
             String line;
+            
             while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(":");
-                if (parts.length < 2) {
-                    continue; // Skip invalid lines
+                if(line.contains(":")){
+                    String[] parts = line.split(":");
+                    String command = parts[0];
+                    String[] arguments = parts[1].split(", ");
+                    
+
+                    switch (command) {
+                        case "Student":
+                            String fullName = arguments[0];
+                            String[] parts2 = fullName.split(" ");
+                            
+                            String name = parts2[0] ;
+                            String surname = parts2[1];
+                            int age = Integer.parseInt(arguments[1].trim());
+                            String studentId = arguments[2].trim();
+                            addStudent(new Student(name, surname, age, studentId));
+                            
+                             break;
+                        case "Grade":
+                            String id = arguments[0].trim();
+                            String examName = arguments[1].trim();
+                            float weight = Float.parseFloat(arguments[2].trim());
+                            float grade = Float.parseFloat(arguments[3].trim());
+                            try {
+                                Student student = getStudent(id);
+                                if(student!=null){
+                                    student.setGrade(examName, weight, grade);
+                                }
+                                
+                            } catch (Exception e) {
+                                System.out.println("Error: " + e.getMessage());
+                            }
+                            break;
+                        case "GradesOf":
+                            printGradesOf(arguments[0].trim());
+                            break;
+                        default:
+                            System.out.println("Unknown command: " + command);
+                            break;
+                    }
                 }
-                String command = parts[0].trim();
-                String[] args = parts[1].trim().split(", ");
-                for (String string : args) {
-                    System.out.println(string);
-                }
-                switch (command) {
-                    case "Student":
-                        if (args.length == 4) {
-                            String name = args[0].trim();
-                            String surname = args[1].trim();
-                            int age = Integer.parseInt(args[2].trim());
-                            String studentID = args[3].trim();
-                            this.addStudent(new Student(name, surname, age, studentID));
-                        }
-                        break;
-                    case "Grade":
-                        if (args.length == 4) {
-                            String studentID = args[0].trim();
-                            String examName = args[1].trim();
-                            double weight = Double.parseDouble(args[2].trim());
-                            int grade = Integer.parseInt(args[3].trim());
-                            getStudent(studentID).setGrade(examName, (float)weight, (float)grade);
-                        }
-                        break;
-                    case "GradesOf":
-                        if (args.length == 1) {
-                            String studentID = args[0].trim();
-                            printGradesOf(studentID);
-                        }
-                        break;
-                    case "PrintByNameOrder":
-                        printStudentsByNameOrder();
-                        break;
-                    case "PrintByGradeAverages":
-                        printStudentsGradeAverages();
-                        break;
-                    case "PrintStudents":
-                        printStudents();
-                        break;
-                    default:
-                        // Invalid command
-                        break;
+                else{
+                    String command = line;
+                    
+                    switch (command) {
+                        case "PrintByNameOrder":
+                            printStudentsByNameOrder();
+                            break;
+                        case "PrintByGradeAverages":
+                            printStudentsGradeAverages();
+                            break;
+                        case "PrintStudents":
+                            printStudents();
+                            break;
+                        default:
+                            System.out.println("Unknown command: " + command);
+                            break;
+                    }
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Error reading the file: " + e.getMessage());
         }
     }
+    
 }
